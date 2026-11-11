@@ -16,5 +16,5 @@ Official initial release of the RapidxCloud pure-Rust cryptographic engine and c
 
 ### Binary Verification Hashes (SHA-256)
 - `rapidxcloud_crypto_wasm.wasm`: `03645abcf5c78a4fc799a1748537df6e5028cd41d1ccd287996ed044a5862b7c`
-- `libcanondrive_crypto.so`: `a3c51c0fe8df60c339309515dfb5daec27456917577099c541f581af9ccd5f78`
+- `librapidxcloud_crypto.so`: `a3c51c0fe8df60c339309515dfb5daec27456917577099c541f581af9ccd5f78`
 
