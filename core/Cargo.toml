@@ -1,0 +1,24 @@
+[package]
+name = "rapidxcloud-crypto-core"
+version = "2.0.0"
+edition = "2021"
+authors = ["RapidXCloud Cryptography Team"]
+description = "Pure Rust, zero-allocation/zeroize hardened cryptographic core for Android & WASM"
+
+[lib]
+crate-type = ["rlib", "staticlib", "cdylib"]
+
+[dependencies]
+aes-gcm = { version = "0.11.1", default-features = false, features = ["alloc", "aes"] }
+argon2 = { version = "0.6.0", default-features = false, features = ["alloc"] }
+hkdf = "0.13.0"
+hmac = "0.13.0"
+sha2 = "0.11.1"
+sha1 = "0.11.0"
+zeroize = { version = "1.8", default-features = false, features = ["alloc"] }
+base64ct = { version = "1.6", default-features = false, features = ["alloc"] }
+getrandom = { version = "0.2.17", default-features = false, features = ["custom"] }
+unicode-normalization = { version = "0.1.24", default-features = false }
+
+[features]
+default = []

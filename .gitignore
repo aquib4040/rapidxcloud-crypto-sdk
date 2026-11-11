@@ -1,0 +1,25 @@
+# Rust build artifacts
+/target/
+**/*.rs.bk
+*.bk
+
+# Compiled native and WebAssembly outputs
+*.so
+*.dylib
+*.dll
+*.wasm
+*.a
+*.lib
+
+# IDE and OS files
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Profiling and test dumps
+profraw
+*.profdata
+

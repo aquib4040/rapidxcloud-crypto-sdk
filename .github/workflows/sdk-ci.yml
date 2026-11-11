@@ -1,0 +1,97 @@
+name: RapidxCloud Crypto SDK CI/CD
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+  workflow_dispatch:
+    inputs:
+      release_build:
+        description: 'Build production release artifacts'
+        required: false
+        type: boolean
+        default: true
+
+jobs:
+  test:
+    name: Test Core & C-FFI (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v4
+
+      - name: Setup Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+
+      - name: Cache Cargo Dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-
+
+      - name: Run Workspace Tests
+        run: cargo test --workspace --verbose
+
+      - name: Check WebAssembly Compilation
+        run: cargo check -p rapidxcloud-crypto-wasm --target wasm32-unknown-unknown
+
+  build-wasm:
+    name: Build WebAssembly Core
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v4
+
+      - name: Setup Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+
+      - name: Build WASM Release Binary
+        run: cargo build -p rapidxcloud-crypto-wasm --target wasm32-unknown-unknown --release
+
+      - name: Verify WASM Binary Output
+        run: |
+          ls -lh target/wasm32-unknown-unknown/release/rapidxcloud_crypto_wasm.wasm
+
+      - name: Upload WebAssembly Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: rapidxcloud-crypto-wasm
+          path: target/wasm32-unknown-unknown/release/rapidxcloud_crypto_wasm.wasm
+          if-no-files-found: error
+
+  build-native:
+    name: Build Native JNI / C-FFI Libraries
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v4
+
+      - name: Setup Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Build Release Native Library
+        run: cargo build -p canondrive-crypto-android --release
+
+      - name: Upload Native Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: rapidxcloud-crypto-native-linux
+          path: target/release/libcanondrive_crypto.so
+          if-no-files-found: error

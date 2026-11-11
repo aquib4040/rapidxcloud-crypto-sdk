@@ -1,0 +1,7 @@
+[workspace]
+members = [
+    "core",
+    "wasm",
+    "android",
+]
+resolver = "2"
