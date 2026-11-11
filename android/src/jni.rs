@@ -1,10 +1,10 @@
 //! jni.rs — Android JNI Native Interface Bindings
 //! Exposes NativeCrypto methods to Java/Kotlin in in.rapidxcloud.drive.crypto.NativeCrypto
 
+use ::jni::objects::{JByteArray, JClass, JString};
+use ::jni::sys::{jboolean, jbyteArray, jint, jlong, jstring};
+use ::jni::JNIEnv;
 use grammers_tl_types as tl;
-use jni::objects::{JByteArray, JClass, JString};
-use jni::sys::{jboolean, jbyteArray, jint, jlong};
-use jni::JNIEnv;
 use rapidxcloud_crypto_core::aes_gcm;
 use rapidxcloud_crypto_core::hkdf;
 use rapidxcloud_crypto_core::kdf;
@@ -393,6 +393,18 @@ pub extern "system" fn Java_in_rapidxcloud_drive_crypto_NativeCrypto_decryptStre
 
     match env.byte_array_from_slice(pt.as_slice()) {
         Ok(arr) => arr.into_raw(),
+        Err(_) => std::ptr::null_mut(),
+    }
+}
+
+#[no_mangle]
+pub extern "system" fn Java_in_rapidxcloud_drive_crypto_NativeCrypto_getCryptoVersion(
+    env: JNIEnv,
+    _class: JClass,
+) -> jstring {
+    let version = "2.0.1";
+    match env.new_string(version) {
+        Ok(s) => s.into_raw(),
         Err(_) => std::ptr::null_mut(),
     }
 }
