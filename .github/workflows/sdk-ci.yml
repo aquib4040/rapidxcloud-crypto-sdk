@@ -3,6 +3,7 @@ name: RapidxCloud Crypto SDK CI/CD
 on:
   push:
     branches: [main, master]
+    tags: ['v*']
   pull_request:
     branches: [main, master]
   workflow_dispatch:
@@ -95,3 +96,32 @@ jobs:
           name: rapidxcloud-crypto-native-linux
           path: target/release/libcanondrive_crypto.so
           if-no-files-found: error
+
+  publish-release:
+    name: Publish GitHub Release
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [build-wasm, build-native]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v4
+
+      - name: Download WASM Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: rapidxcloud-crypto-wasm
+
+      - name: Download Native Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: rapidxcloud-crypto-native-linux
+
+      - name: Create or Update GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            rapidxcloud_crypto_wasm.wasm
+            libcanondrive_crypto.so
+          generate_release_notes: true
