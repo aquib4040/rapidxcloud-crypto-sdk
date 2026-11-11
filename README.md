@@ -34,7 +34,7 @@ Built in 100% memory-safe Rust, it provides a single unified source of truth acr
       ┌─────────────────────────────┐                     ┌─────────────────────────────┐
       │      ANDROID / C-FFI        │                     │        BROWSER WASM         │
       │      (crypto/android)       │                     │        (crypto/wasm)        │
-      │   canondrive_crypto (JNI)   │                     │   rapidxcloud_crypto.wasm   │
+      │   rapidxcloud_crypto (JNI)  │                     │   rapidxcloud_crypto.wasm   │
       └──────────────┬──────────────┘                     └──────────────┬──────────────┘
                      ▼                                                   ▼
            RapidXCloud Android App                                    web-new
@@ -70,7 +70,7 @@ Built in 100% memory-safe Rust, it provides a single unified source of truth acr
 | Crate | Target | Description |
 |:---|:---|:---|
 | **`rapidxcloud-crypto-core`** (`core/`) | Pure Rust (`rlib`, `staticlib`) | Core cryptographic protocol primitives, key bags, streaming state machine, and test vectors. Free of platform-specific dependencies. |
-| **`canondrive-crypto-android`** (`android/`) | Android Native (`cdylib`, `staticlib`) | Direct JNI bindings for Android Kotlin/Java apps (`NativeCrypto.kt`) and C-ABI Foreign Function Interface (FFI) for iOS and desktop. |
+| **`rapidxcloud-crypto-android`** (`android/`) | Android Native (`cdylib`, `staticlib`) | Direct JNI bindings for Android Kotlin/Java apps (`NativeCrypto.kt`) and C-ABI Foreign Function Interface (FFI) for iOS and desktop. |
 | **`rapidxcloud-crypto-wasm`** (`wasm/`) | WebAssembly (`cdylib`) | Pure C-ABI WebAssembly bridge for browser main threads, Web Worker pools, and Service Worker on-demand range streaming. |
 
 ---

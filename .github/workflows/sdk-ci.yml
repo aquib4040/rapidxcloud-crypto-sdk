@@ -88,13 +88,13 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
 
       - name: Build Release Native Library
-        run: cargo build -p canondrive-crypto-android --release
+        run: cargo build -p rapidxcloud-crypto-android --release
 
       - name: Upload Native Artifact
         uses: actions/upload-artifact@v4
         with:
           name: rapidxcloud-crypto-native-linux
-          path: target/release/libcanondrive_crypto.so
+          path: target/release/librapidxcloud_crypto.so
           if-no-files-found: error
 
   publish-release:
@@ -123,5 +123,5 @@ jobs:
         with:
           files: |
             rapidxcloud_crypto_wasm.wasm
-            libcanondrive_crypto.so
+            librapidxcloud_crypto.so
           generate_release_notes: true

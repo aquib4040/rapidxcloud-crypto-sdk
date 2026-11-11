@@ -1,12 +1,12 @@
 [package]
-name = "canondrive-crypto-android"
+name = "rapidxcloud-crypto-android"
 version = "2.0.0"
 edition = "2021"
 authors = ["RapidXCloud Cryptography Team"]
 description = "Android JNI and C-FFI native bridge for RapidxCloud shared cryptographic core"
 
 [lib]
-name = "canondrive_crypto"
+name = "rapidxcloud_crypto"
 crate-type = ["cdylib", "staticlib", "rlib"]
 
 [dependencies]
