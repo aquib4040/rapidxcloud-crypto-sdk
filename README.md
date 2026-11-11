@@ -8,7 +8,7 @@
 
 <p align="center">
   <a href="https://github.com/aquib4040/rapidxcloud-crypto-sdk/actions/workflows/sdk-ci.yml"><img src="https://github.com/aquib4040/rapidxcloud-crypto-sdk/actions/workflows/sdk-ci.yml/badge.svg" alt="CI/CD Build & Test" /></a>
-  <a href="LICENSE"><img src="https://img.shields.io/badge/License-Apache%202.0%20%2F%20MIT-blue.svg" alt="License: Apache 2.0 / MIT" /></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-GPL%20v3-blue.svg" alt="License: GPL v3" /></a>
   <a href="https://rust-lang.org"><img src="https://img.shields.io/badge/Rust-2021%20Edition-orange.svg" alt="Rust Edition 2021" /></a>
   <a href="https://webassembly.org"><img src="https://img.shields.io/badge/WebAssembly-WASM32-purple.svg" alt="WASM" /></a>
   <a href="https://developer.android.com"><img src="https://img.shields.io/badge/Android-JNI%20%26%20NDK-green.svg" alt="Android JNI" /></a>
@@ -118,8 +118,4 @@ All cryptographic primitives are tested against RFC test vectors and adversarial
 
 ## License
 
-Licensed under either of:
-- Apache License, Version 2.0 ([LICENSE-APACHE](LICENSE-APACHE) or http://www.apache.org/licenses/LICENSE-2.0)
-- MIT license ([LICENSE-MIT](LICENSE-MIT) or http://opensource.org/licenses/MIT)
-
-at your option.
+This project is licensed under the GNU General Public License v3.0 (GPL-3.0) — see [LICENSE](LICENSE) for details.
