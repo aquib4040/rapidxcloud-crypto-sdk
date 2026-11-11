@@ -116,7 +116,7 @@ mod tests {
     #[test]
     fn test_argon2id_kdf_and_unicode_nfc() {
         let salt = b"deterministic16b";
-        
+
         // Test unicode NFC normalization: 'é' composed vs decomposed
         let pw_composed = "café";
         let pw_decomposed = "cafe\u{0301}";
@@ -165,12 +165,14 @@ mod tests {
         assert!(fail_res.is_err());
 
         // Recover with code (including lowercase and ambiguous character substitutions)
-        let (recovered_enc_key, _, _) = recover_with_code(&key_bag, &recovery_code, "NewPass987!").unwrap();
+        let (recovered_enc_key, _, _) =
+            recover_with_code(&key_bag, &recovery_code, "NewPass987!").unwrap();
         assert_eq!(enc_key.as_slice(), recovered_enc_key.as_slice());
 
         // Ambiguous lowercase test (e.g. replacing '0' with 'o' or 'O')
         let altered_code = recovery_code.replace('0', "o").to_lowercase();
-        let (recovered_altered, _, _) = recover_with_code(&key_bag, &altered_code, "AnotherPass11!").unwrap();
+        let (recovered_altered, _, _) =
+            recover_with_code(&key_bag, &altered_code, "AnotherPass11!").unwrap();
         assert_eq!(enc_key.as_slice(), recovered_altered.as_slice());
     }
 
@@ -193,12 +195,18 @@ mod tests {
         assert_ne!(client_share.as_slice(), file_key.as_slice());
 
         // Information theoretic reconstruction
-        let reconstructed = combine_shares(client_share.as_slice(), server_share.as_slice()).unwrap();
+        let reconstructed =
+            combine_shares(client_share.as_slice(), server_share.as_slice()).unwrap();
         assert_eq!(reconstructed.as_slice(), file_key.as_slice());
 
         // Seal / unseal client share under encKey
         let enc_key = generate_key().unwrap();
-        let sealed = seal_client_share(enc_key.as_slice(), client_share.as_slice(), Some(b"file-123")).unwrap();
+        let sealed = seal_client_share(
+            enc_key.as_slice(),
+            client_share.as_slice(),
+            Some(b"file-123"),
+        )
+        .unwrap();
         assert_eq!(sealed.len(), 12 + 32 + 16); // 60 bytes
 
         let unsealed = unseal_client_share(enc_key.as_slice(), &sealed, Some(b"file-123")).unwrap();
@@ -216,11 +224,13 @@ mod tests {
         let total_chunks = 5;
 
         // V1 encryption
-        let sealed = encrypt_chunk_v1(key.as_slice(), chunk_index, total_chunks, &plaintext).unwrap();
+        let sealed =
+            encrypt_chunk_v1(key.as_slice(), chunk_index, total_chunks, &plaintext).unwrap();
         assert_eq!(sealed.len(), 12 + 1024 + 16);
 
         // V1 decryption with correct index & total
-        let decrypted = decrypt_chunk_v1(key.as_slice(), chunk_index, total_chunks, &sealed).unwrap();
+        let decrypted =
+            decrypt_chunk_v1(key.as_slice(), chunk_index, total_chunks, &sealed).unwrap();
         assert_eq!(decrypted.as_slice(), &plaintext[..]);
 
         // Decryption fails if chunk index or total chunks is swapped (anti-splicing protection)
@@ -234,7 +244,7 @@ mod tests {
     #[test]
     fn test_stream_decryptor_state_machine() {
         let key = generate_key().unwrap();
-        let chunks_plain = vec![
+        let chunks_plain = [
             b"First chunk data...".to_vec(),
             b"Second chunk data...".to_vec(),
             b"Third chunk data...".to_vec(),

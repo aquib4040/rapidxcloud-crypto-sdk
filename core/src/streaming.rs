@@ -9,11 +9,7 @@ pub const STREAM_CHUNK_OVERHEAD: usize = NONCE_LEN + TAG_LEN; // 28 bytes
 pub const DEFAULT_CHUNK_PLAINTEXT: usize = 4 * 1024 * 1024; // 4 MiB
 
 /// Encrypts one plaintext chunk into self-describing [12-byte IV][Ciphertext][16-byte Tag]
-pub fn encrypt_chunk(
-    key: &[u8],
-    plaintext: &[u8],
-    aad: Option<&[u8]>,
-) -> Result<Vec<u8>> {
+pub fn encrypt_chunk(key: &[u8], plaintext: &[u8], aad: Option<&[u8]>) -> Result<Vec<u8>> {
     let nonce = aes_gcm::generate_nonce()?;
     let ciphertext = aes_gcm::encrypt(key, &nonce, plaintext, aad)?;
 
@@ -35,11 +31,7 @@ pub fn encrypt_chunk_v1(
 }
 
 /// Decrypts one self-describing [12-byte IV][Ciphertext][16-byte Tag] chunk
-pub fn decrypt_chunk(
-    key: &[u8],
-    sealed_chunk: &[u8],
-    aad: Option<&[u8]>,
-) -> Result<SecureBytes> {
+pub fn decrypt_chunk(key: &[u8], sealed_chunk: &[u8], aad: Option<&[u8]>) -> Result<SecureBytes> {
     if sealed_chunk.len() < STREAM_CHUNK_OVERHEAD {
         return Err(CryptoError::InvalidFormat(
             "Sealed chunk shorter than nonce + tag overhead (28 bytes)".into(),

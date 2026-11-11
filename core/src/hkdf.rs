@@ -37,11 +37,7 @@ pub fn hkdf_derive(
 }
 
 /// Derives a 32-byte key via HKDF with optional salt.
-pub fn hkdf_derive_32(
-    ikm: &[u8],
-    salt: Option<&[u8]>,
-    info: &[u8],
-) -> Result<SecureKey<KEY_LEN>> {
+pub fn hkdf_derive_32(ikm: &[u8], salt: Option<&[u8]>, info: &[u8]) -> Result<SecureKey<KEY_LEN>> {
     let bytes = hkdf_derive(ikm, salt, info, KEY_LEN)?;
     let mut out = [0u8; KEY_LEN];
     out.copy_from_slice(&bytes);

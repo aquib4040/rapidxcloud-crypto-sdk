@@ -1,4 +1,5 @@
 //! rapidxcloud-crypto-wasm — Pure WebAssembly Bridge for Browser E2EE Operations
+#![allow(clippy::missing_safety_doc)]
 
 use core::slice;
 use rapidxcloud_crypto_core::aes_gcm::{self, NONCE_LEN, TAG_LEN};
@@ -389,7 +390,11 @@ pub unsafe extern "C" fn rxc_seal_client_share(
     out_max: usize,
     out_written: *mut usize,
 ) -> i32 {
-    if enc_key_ptr.is_null() || client_share_ptr.is_null() || out_buf.is_null() || out_written.is_null() {
+    if enc_key_ptr.is_null()
+        || client_share_ptr.is_null()
+        || out_buf.is_null()
+        || out_written.is_null()
+    {
         return RXC_ERR_INVALID_PARAM;
     }
 
@@ -552,7 +557,12 @@ pub unsafe extern "C" fn rxc_decrypt_chunk_with_iv(
     out_max: usize,
     out_written: *mut usize,
 ) -> i32 {
-    if key_ptr.is_null() || iv_ptr.is_null() || ct_ptr.is_null() || out_buf.is_null() || out_written.is_null() {
+    if key_ptr.is_null()
+        || iv_ptr.is_null()
+        || ct_ptr.is_null()
+        || out_buf.is_null()
+        || out_written.is_null()
+    {
         return RXC_ERR_INVALID_PARAM;
     }
     if ct_len < TAG_LEN {

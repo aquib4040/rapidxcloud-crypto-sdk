@@ -116,8 +116,8 @@ impl SecureBytes {
             return false;
         }
         let mut diff = 0u8;
-        for i in 0..self.inner.len() {
-            diff |= self.inner[i] ^ other[i];
+        for (&a, &b) in self.inner.iter().zip(other.iter()) {
+            diff |= a ^ b;
         }
         diff == 0
     }

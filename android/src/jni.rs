@@ -1,10 +1,10 @@
 //! jni.rs — Android JNI Native Interface Bindings
 //! Exposes NativeCrypto methods to Java/Kotlin in in.rapidxcloud.drive.crypto.NativeCrypto
 
+use grammers_tl_types as tl;
 use jni::objects::{JByteArray, JClass, JString};
 use jni::sys::{jboolean, jbyteArray, jint, jlong};
 use jni::JNIEnv;
-use grammers_tl_types as tl;
 use rapidxcloud_crypto_core::aes_gcm;
 use rapidxcloud_crypto_core::hkdf;
 use rapidxcloud_crypto_core::kdf;
@@ -176,20 +176,12 @@ pub extern "system" fn Java_in_rapidxcloud_drive_crypto_NativeCrypto_aesGcmEncry
     };
 
     let aad_bytes = if !aad.is_null() {
-        match env.convert_byte_array(&aad) {
-            Ok(b) => Some(b),
-            Err(_) => None,
-        }
+        env.convert_byte_array(&aad).ok()
     } else {
         None
     };
 
-    let ct = match aes_gcm::encrypt(
-        &key_bytes,
-        &nonce_bytes,
-        &pt_bytes,
-        aad_bytes.as_deref(),
-    ) {
+    let ct = match aes_gcm::encrypt(&key_bytes, &nonce_bytes, &pt_bytes, aad_bytes.as_deref()) {
         Ok(c) => c,
         Err(_) => return std::ptr::null_mut(),
     };
@@ -225,20 +217,12 @@ pub extern "system" fn Java_in_rapidxcloud_drive_crypto_NativeCrypto_aesGcmDecry
     };
 
     let aad_bytes = if !aad.is_null() {
-        match env.convert_byte_array(&aad) {
-            Ok(b) => Some(b),
-            Err(_) => None,
-        }
+        env.convert_byte_array(&aad).ok()
     } else {
         None
     };
 
-    let pt = match aes_gcm::decrypt(
-        &key_bytes,
-        &nonce_bytes,
-        &ct_bytes,
-        aad_bytes.as_deref(),
-    ) {
+    let pt = match aes_gcm::decrypt(&key_bytes, &nonce_bytes, &ct_bytes, aad_bytes.as_deref()) {
         Ok(p) => p,
         Err(_) => return std::ptr::null_mut(),
     };
@@ -369,11 +353,7 @@ pub extern "system" fn Java_in_rapidxcloud_drive_crypto_NativeCrypto_encryptStre
         None
     };
 
-    let sealed = match streaming::encrypt_chunk(
-        &key_bytes,
-        &pt_bytes,
-        aad_bytes.as_deref(),
-    ) {
+    let sealed = match streaming::encrypt_chunk(&key_bytes, &pt_bytes, aad_bytes.as_deref()) {
         Ok(s) => s,
         Err(_) => return std::ptr::null_mut(),
     };
@@ -406,11 +386,7 @@ pub extern "system" fn Java_in_rapidxcloud_drive_crypto_NativeCrypto_decryptStre
         None
     };
 
-    let pt = match streaming::decrypt_chunk(
-        &key_bytes,
-        &sealed_bytes,
-        aad_bytes.as_deref(),
-    ) {
+    let pt = match streaming::decrypt_chunk(&key_bytes, &sealed_bytes, aad_bytes.as_deref()) {
         Ok(p) => p,
         Err(_) => return std::ptr::null_mut(),
     };

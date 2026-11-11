@@ -91,7 +91,9 @@ pub fn derive_wrap_key(secret: &str, salt: &[u8], info: &str) -> Result<SecureKe
 /// Wraps Master Secret M under a secret string using AES-256-GCM.
 pub fn wrap_master(master_secret: &[u8], secret: &str, info: &str) -> Result<WrappedSecret> {
     if master_secret.len() != KEY_LEN {
-        return Err(CryptoError::InvalidParameter("Master secret must be 32 bytes"));
+        return Err(CryptoError::InvalidParameter(
+            "Master secret must be 32 bytes",
+        ));
     }
     let salt = kdf::generate_salt(16)?;
     let wrap_key = derive_wrap_key(secret, &salt, info)?;
@@ -110,7 +112,11 @@ pub fn wrap_master(master_secret: &[u8], secret: &str, info: &str) -> Result<Wra
 }
 
 /// Unwraps Master Secret M using secret string and HKDF info tag.
-pub fn unwrap_master(wrapped: &WrappedSecret, secret: &str, info: &str) -> Result<SecureKey<KEY_LEN>> {
+pub fn unwrap_master(
+    wrapped: &WrappedSecret,
+    secret: &str,
+    info: &str,
+) -> Result<SecureKey<KEY_LEN>> {
     let salt = Base64::decode_vec(&wrapped.salt)
         .map_err(|e| CryptoError::InvalidFormat(format!("Salt base64 invalid: {}", e)))?;
     let sealed = Base64::decode_vec(&wrapped.data)
@@ -127,7 +133,9 @@ pub fn unwrap_master(wrapped: &WrappedSecret, secret: &str, info: &str) -> Resul
     let plaintext = aes_gcm::decrypt(wrap_key.as_slice(), nonce, ciphertext, None)?;
 
     if plaintext.len() != KEY_LEN {
-        return Err(CryptoError::InvalidFormat("Unwrapped master key wrong length".into()));
+        return Err(CryptoError::InvalidFormat(
+            "Unwrapped master key wrong length".into(),
+        ));
     }
 
     let mut m = [0u8; KEY_LEN];
@@ -155,7 +163,10 @@ pub fn enroll_master(password: &str) -> Result<(SecureKey<KEY_LEN>, KeyBag, Stri
 }
 
 /// Unlocks KeyBag using account password.
-pub fn unlock_with_password(key_bag: &KeyBag, password: &str) -> Result<(SecureKey<KEY_LEN>, SecureKey<KEY_LEN>)> {
+pub fn unlock_with_password(
+    key_bag: &KeyBag,
+    password: &str,
+) -> Result<(SecureKey<KEY_LEN>, SecureKey<KEY_LEN>)> {
     let m = unwrap_master(&key_bag.wrapped_pw, password, WRAP_INFO_PW)?;
     let enc_key = crate::master_secret::derive_enc_key(m.as_slice())?;
     Ok((enc_key, m))

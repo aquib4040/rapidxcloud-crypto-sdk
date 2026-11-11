@@ -35,7 +35,9 @@ pub const TEN_MEGABYTES: i64 = 10 * 1024 * 1024;
 /// Computes lower 64 bits of SHA-1 hash as little-endian i64 (Telegram MTProto specification)
 pub fn compute_auth_key_id(auth_key: &[u8]) -> Result<i64> {
     if auth_key.len() != 256 {
-        return Err(CryptoError::InvalidParameter("MTProto auth_key must be exactly 256 bytes"));
+        return Err(CryptoError::InvalidParameter(
+            "MTProto auth_key must be exactly 256 bytes",
+        ));
     }
     let mut hasher = Sha1::new();
     hasher.update(auth_key);
@@ -71,7 +73,10 @@ pub fn parse_telethon_session(session: &str) -> Option<(i32, String, i32, Vec<u8
     let mut pos = 1;
 
     let ip_address = if !is_ipv6 {
-        let ip = format!("{}.{}.{}.{}", decoded[1], decoded[2], decoded[3], decoded[4]);
+        let ip = format!(
+            "{}.{}.{}.{}",
+            decoded[1], decoded[2], decoded[3], decoded[4]
+        );
         pos = 5;
         ip
     } else {
@@ -99,4 +104,3 @@ pub fn parse_telethon_session(session: &str) -> Option<(i32, String, i32, Vec<u8
 
     Some((dc_id, ip_address, port, auth_key, auth_key_id))
 }
-

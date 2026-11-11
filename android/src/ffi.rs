@@ -33,14 +33,7 @@ pub unsafe extern "C" fn rxc_argon2id(
     let salt = slice::from_raw_parts(salt_ptr, salt_len);
     let out_slice = slice::from_raw_parts_mut(out_buf, out_len);
 
-    match kdf::derive_key(
-        password,
-        salt,
-        memory_kib,
-        iterations,
-        parallelism,
-        out_len,
-    ) {
+    match kdf::derive_key(password, salt, memory_kib, iterations, parallelism, out_len) {
         Ok(derived) => {
             out_slice.copy_from_slice(&derived);
             RXC_OK
@@ -192,8 +185,8 @@ pub unsafe extern "C" fn rxc_xor_shares(
 
     // Read byte-by-byte into a stack buffer to guarantee no Rust mutable reference aliasing
     let mut tmp = [0u8; 32];
-    for i in 0..32 {
-        tmp[i] = *share_a_ptr.add(i) ^ *share_b_ptr.add(i);
+    for (i, byte) in tmp.iter_mut().enumerate() {
+        *byte = *share_a_ptr.add(i) ^ *share_b_ptr.add(i);
     }
 
     core::ptr::copy_nonoverlapping(tmp.as_ptr(), out_buf, 32);
@@ -209,14 +202,36 @@ mod tests {
     fn test_ffi_null_pointer_rejection() {
         unsafe {
             assert_eq!(
-                rxc_argon2id(std::ptr::null(), 0, std::ptr::null(), 0, 1024, 1, 1, std::ptr::null_mut(), 32),
+                rxc_argon2id(
+                    std::ptr::null(),
+                    0,
+                    std::ptr::null(),
+                    0,
+                    1024,
+                    1,
+                    1,
+                    std::ptr::null_mut(),
+                    32
+                ),
                 RXC_ERR_INVALID_PARAM
             );
 
             let mut out = [0u8; 32];
             let mut written = 0;
             assert_eq!(
-                rxc_aes_gcm_encrypt(std::ptr::null(), 32, std::ptr::null(), 12, std::ptr::null(), 10, std::ptr::null(), 0, out.as_mut_ptr(), 32, &mut written),
+                rxc_aes_gcm_encrypt(
+                    std::ptr::null(),
+                    32,
+                    std::ptr::null(),
+                    12,
+                    std::ptr::null(),
+                    10,
+                    std::ptr::null(),
+                    0,
+                    out.as_mut_ptr(),
+                    32,
+                    &mut written
+                ),
                 RXC_ERR_INVALID_PARAM
             );
 

@@ -19,7 +19,9 @@ pub fn xor_shares_32(a: &[u8; SHARE_LEN], b: &[u8; SHARE_LEN]) -> SecureKey<SHAR
 /// Constant-time bitwise XOR of two dynamic key slices.
 pub fn xor_shares(a: &[u8], b: &[u8]) -> Result<SecureKey<SHARE_LEN>> {
     if a.len() != SHARE_LEN || b.len() != SHARE_LEN {
-        return Err(CryptoError::InvalidParameter("Shares must be exactly 32 bytes"));
+        return Err(CryptoError::InvalidParameter(
+            "Shares must be exactly 32 bytes",
+        ));
     }
     let a_arr: &[u8; SHARE_LEN] = a.try_into().unwrap();
     let b_arr: &[u8; SHARE_LEN] = b.try_into().unwrap();
@@ -51,7 +53,9 @@ pub fn seal_client_share(
     aad: Option<&[u8]>,
 ) -> Result<Vec<u8>> {
     if client_share.len() != SHARE_LEN {
-        return Err(CryptoError::InvalidParameter("ClientShare must be 32 bytes"));
+        return Err(CryptoError::InvalidParameter(
+            "ClientShare must be 32 bytes",
+        ));
     }
     let nonce = aes_gcm::generate_nonce()?;
     let ciphertext = aes_gcm::encrypt(enc_key, &nonce, client_share, aad)?;
@@ -69,14 +73,18 @@ pub fn unseal_client_share(
     aad: Option<&[u8]>,
 ) -> Result<SecureKey<SHARE_LEN>> {
     if sealed_share.len() < NONCE_LEN + TAG_LEN {
-        return Err(CryptoError::InvalidFormat("Sealed client share too short".into()));
+        return Err(CryptoError::InvalidFormat(
+            "Sealed client share too short".into(),
+        ));
     }
     let nonce = &sealed_share[..NONCE_LEN];
     let ciphertext = &sealed_share[NONCE_LEN..];
 
     let plaintext = aes_gcm::decrypt(enc_key, nonce, ciphertext, aad)?;
     if plaintext.len() != SHARE_LEN {
-        return Err(CryptoError::InvalidFormat("Unsealed client share wrong length".into()));
+        return Err(CryptoError::InvalidFormat(
+            "Unsealed client share wrong length".into(),
+        ));
     }
 
     let mut share = [0u8; SHARE_LEN];

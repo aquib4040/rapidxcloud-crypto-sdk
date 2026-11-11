@@ -12,8 +12,8 @@ pub fn generate_recovery_code() -> Result<String> {
     getrandom::getrandom(&mut random_bytes).map_err(|_| CryptoError::EntropyError)?;
 
     let mut out = String::with_capacity(39);
-    for i in 0..32 {
-        let idx = (random_bytes[i] as usize) & 31;
+    for (i, &b) in random_bytes.iter().enumerate() {
+        let idx = (b as usize) & 31;
         out.push(RECOVERY_ALPHABET[idx] as char);
         if i % 5 == 4 && i != 31 {
             out.push('-');
@@ -40,4 +40,3 @@ pub fn normalize_recovery_code(code: &str) -> String {
         })
         .collect()
 }
-

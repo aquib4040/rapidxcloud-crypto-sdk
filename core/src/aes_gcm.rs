@@ -26,24 +26,23 @@ pub fn generate_nonce() -> Result<[u8; NONCE_LEN]> {
 
 /// Encrypts plaintext using AES-256-GCM with optional Additional Authenticated Data (AAD).
 /// Returns: ciphertext with 16-byte authentication tag appended.
-pub fn encrypt(
-    key: &[u8],
-    nonce: &[u8],
-    plaintext: &[u8],
-    aad: Option<&[u8]>,
-) -> Result<Vec<u8>> {
+pub fn encrypt(key: &[u8], nonce: &[u8], plaintext: &[u8], aad: Option<&[u8]>) -> Result<Vec<u8>> {
     if key.len() != KEY_LEN {
-        return Err(CryptoError::InvalidParameter("AES-256 key must be exactly 32 bytes"));
+        return Err(CryptoError::InvalidParameter(
+            "AES-256 key must be exactly 32 bytes",
+        ));
     }
     if nonce.len() != NONCE_LEN {
-        return Err(CryptoError::InvalidParameter("GCM nonce must be exactly 12 bytes"));
+        return Err(CryptoError::InvalidParameter(
+            "GCM nonce must be exactly 12 bytes",
+        ));
     }
 
     let cipher_key = Key::<Aes256Gcm>::try_from(key)
         .map_err(|_| CryptoError::InvalidParameter("Invalid AES-256 key"))?;
     let cipher = Aes256Gcm::new(&cipher_key);
-    let gcm_nonce = Nonce::try_from(nonce)
-        .map_err(|_| CryptoError::InvalidParameter("Invalid GCM nonce"))?;
+    let gcm_nonce =
+        Nonce::try_from(nonce).map_err(|_| CryptoError::InvalidParameter("Invalid GCM nonce"))?;
 
     let payload = Payload {
         msg: plaintext,
@@ -65,10 +64,14 @@ pub fn decrypt(
     aad: Option<&[u8]>,
 ) -> Result<SecureBytes> {
     if key.len() != KEY_LEN {
-        return Err(CryptoError::InvalidParameter("AES-256 key must be exactly 32 bytes"));
+        return Err(CryptoError::InvalidParameter(
+            "AES-256 key must be exactly 32 bytes",
+        ));
     }
     if nonce.len() != NONCE_LEN {
-        return Err(CryptoError::InvalidParameter("GCM nonce must be exactly 12 bytes"));
+        return Err(CryptoError::InvalidParameter(
+            "GCM nonce must be exactly 12 bytes",
+        ));
     }
     if ciphertext_and_tag.len() < TAG_LEN {
         return Err(CryptoError::AuthenticationFailed);
@@ -77,8 +80,8 @@ pub fn decrypt(
     let cipher_key = Key::<Aes256Gcm>::try_from(key)
         .map_err(|_| CryptoError::InvalidParameter("Invalid AES-256 key"))?;
     let cipher = Aes256Gcm::new(&cipher_key);
-    let gcm_nonce = Nonce::try_from(nonce)
-        .map_err(|_| CryptoError::InvalidParameter("Invalid GCM nonce"))?;
+    let gcm_nonce =
+        Nonce::try_from(nonce).map_err(|_| CryptoError::InvalidParameter("Invalid GCM nonce"))?;
 
     let payload = Payload {
         msg: ciphertext_and_tag,

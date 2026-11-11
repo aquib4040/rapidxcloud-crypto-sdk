@@ -31,7 +31,9 @@ impl fmt::Display for CryptoError {
                 write!(f, "Integrity tampering detected: {}", msg)
             }
             CryptoError::EncryptionFailure => write!(f, "Authenticated encryption failed"),
-            CryptoError::ManifestMismatch(msg) => write!(f, "Manifest verification failed: {}", msg),
+            CryptoError::ManifestMismatch(msg) => {
+                write!(f, "Manifest verification failed: {}", msg)
+            }
             CryptoError::BufferTooSmall => write!(f, "Destination buffer too small"),
         }
     }

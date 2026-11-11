@@ -78,7 +78,7 @@ impl FileManifest {
         let total_chunks = if total_size == 0 {
             1
         } else {
-            ((total_size + chunk_plain as u64 - 1) / chunk_plain as u64) as usize
+            total_size.div_ceil(chunk_plain as u64) as usize
         };
 
         let mut chunks = Vec::with_capacity(total_chunks);

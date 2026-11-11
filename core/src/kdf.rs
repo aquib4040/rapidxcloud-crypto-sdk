@@ -37,7 +37,7 @@ impl KDFProfile {
             KDFProfile::Production256MB => 262_144,   // 256 MiB
             KDFProfile::Interactive64MB => 65_536,    // 64 MiB
             KDFProfile::HighSecurity512MB => 524_288, // 512 MiB
-            KDFProfile::TestFast => 1_024,           // 1 MiB
+            KDFProfile::TestFast => 1_024,            // 1 MiB
         }
     }
 
@@ -72,7 +72,9 @@ impl KDFProfile {
 /// Generates fresh cryptographically secure random salt.
 pub fn generate_salt(len: usize) -> Result<Vec<u8>> {
     if len < MIN_SALT_LEN {
-        return Err(CryptoError::InvalidParameter("Salt length must be at least 16 bytes"));
+        return Err(CryptoError::InvalidParameter(
+            "Salt length must be at least 16 bytes",
+        ));
     }
     let mut salt = vec![0u8; len];
     getrandom::getrandom(&mut salt).map_err(|_| CryptoError::EntropyError)?;
@@ -86,25 +88,25 @@ pub fn validate_kdf_params(
     parallelism: u32,
     out_len: usize,
 ) -> Result<()> {
-    if memory_kib < MIN_KDF_MEMORY_KIB || memory_kib > MAX_KDF_MEMORY_KIB {
+    if !(MIN_KDF_MEMORY_KIB..=MAX_KDF_MEMORY_KIB).contains(&memory_kib) {
         return Err(CryptoError::KdfError(format!(
             "Memory cost {} KiB outside safe bounds [{}, {}]",
             memory_kib, MIN_KDF_MEMORY_KIB, MAX_KDF_MEMORY_KIB
         )));
     }
-    if iterations < MIN_KDF_ITERATIONS || iterations > MAX_KDF_ITERATIONS {
+    if !(MIN_KDF_ITERATIONS..=MAX_KDF_ITERATIONS).contains(&iterations) {
         return Err(CryptoError::KdfError(format!(
             "Iterations {} outside safe bounds [{}, {}]",
             iterations, MIN_KDF_ITERATIONS, MAX_KDF_ITERATIONS
         )));
     }
-    if parallelism < 1 || parallelism > MAX_KDF_PARALLELISM {
+    if !(1..=MAX_KDF_PARALLELISM).contains(&parallelism) {
         return Err(CryptoError::KdfError(format!(
             "Parallelism {} outside safe bounds [1, {}]",
             parallelism, MAX_KDF_PARALLELISM
         )));
     }
-    if out_len < MIN_KDF_OUT_LEN || out_len > MAX_KDF_OUT_LEN {
+    if !(MIN_KDF_OUT_LEN..=MAX_KDF_OUT_LEN).contains(&out_len) {
         return Err(CryptoError::KdfError(format!(
             "Output length {} outside safe bounds [{}, {}]",
             out_len, MIN_KDF_OUT_LEN, MAX_KDF_OUT_LEN
@@ -123,7 +125,9 @@ pub fn derive_key(
     out_len: usize,
 ) -> Result<SecureBytes> {
     if salt.len() < MIN_SALT_LEN {
-        return Err(CryptoError::InvalidParameter("Salt length must be at least 16 bytes"));
+        return Err(CryptoError::InvalidParameter(
+            "Salt length must be at least 16 bytes",
+        ));
     }
     validate_kdf_params(memory_kib, iterations, parallelism, out_len)?;
 
