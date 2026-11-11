@@ -8,8 +8,13 @@ on:
     branches: [main, master]
   workflow_dispatch:
     inputs:
-      release_build:
-        description: 'Build production release artifacts'
+      tag_name:
+        description: 'Release Tag Name (e.g. v2.0.0 or v2.0.1)'
+        required: false
+        type: string
+        default: 'v2.0.0'
+      publish:
+        description: 'Publish release assets to GitHub Release'
         required: false
         type: boolean
         default: true
@@ -99,7 +104,7 @@ jobs:
 
   publish-release:
     name: Publish GitHub Release
-    if: startsWith(github.ref, 'refs/tags/v')
+    if: startsWith(github.ref, 'refs/tags/v') || (github.event_name == 'workflow_dispatch' && github.event.inputs.publish != 'false')
     needs: [build-wasm, build-native]
     runs-on: ubuntu-latest
     permissions:
@@ -108,20 +113,39 @@ jobs:
       - name: Checkout Source
         uses: actions/checkout@v4
 
+      - name: Create Distribution Directory
+        run: mkdir -p ./dist-release
+
       - name: Download WASM Artifact
         uses: actions/download-artifact@v4
         with:
           name: rapidxcloud-crypto-wasm
+          path: ./dist-release
 
       - name: Download Native Artifact
         uses: actions/download-artifact@v4
         with:
           name: rapidxcloud-crypto-native-linux
+          path: ./dist-release
+
+      - name: Determine Target Release Tag
+        id: vars
+        shell: bash
+        run: |
+          if [[ "${{ github.ref }}" == refs/tags/v* ]]; then
+            echo "tag=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+          else
+            echo "tag=${{ github.event.inputs.tag_name || 'v2.0.0' }}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Verify Staged Release Files
+        run: ls -la ./dist-release
 
       - name: Create or Update GitHub Release
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ steps.vars.outputs.tag }}
           files: |
-            rapidxcloud_crypto_wasm.wasm
-            librapidxcloud_crypto.so
+            ./dist-release/rapidxcloud_crypto_wasm.wasm
+            ./dist-release/librapidxcloud_crypto.so
           generate_release_notes: true
